@@ -15,6 +15,7 @@ jobs:
       - name: Deploy with Docker Compose
         run: |
           docker compose down || true
+          docker rm -f wordpress_db wordpress_app || true
           docker compose up -d --build
 
       - name: Check Container Status
