@@ -1,37 +1,22 @@
-name: Docker Compose CI
+name: Deploy WordPress on WSL
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-  validate-and-test:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: self-hosted
 
     steps:
-      - name: Check out repository
+      - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Validate Docker Compose Configuration
+      - name: Deploy with Docker Compose
         run: |
-          docker compose config
+          docker compose down || true
+          docker compose up -d --build
 
-      - name: Start Services
+      - name: Check Container Status
         run: |
-          docker compose up -d
-
-      - name: Verify Container Health
-        run: |
-          sleep 15
           docker compose ps
-          curl -f http://localhost:8080 || exit 1
-
-      - name: Tear Down Services
-        if: always()
-        run: |
-          docker compose down -v
